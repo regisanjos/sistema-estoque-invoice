@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Usuario {
+  id    Int     @id @default(autoincrement())
+  nome  String
+  email String  @unique
+}
+
+model Fornecedor {
+  id      Int      @id @default(autoincrement())
+  nome    String
+  compras Compra[] // Indica que um fornecedor pode ter várias compras
+}
+
+model LocalArmazenamento {
+  id        Int    @id @default(autoincrement())
+  nome      String // Ex: Prateleira A, Gaveta 3
+  itens     Item[] 
+}
+
+model Item {
+  id                   Int                @id @default(autoincrement())
+  nome                 String
+  quantidade           Int                @default(0)
+
+  // Relacionamento com o Local
+  localArmazenamentoId Int
+  local                LocalArmazenamento @relation(fields: [localArmazenamentoId], references: [id])
+
+  // Relacionamento com as Compras
+  compras              Compra[]           
+}
+
+model Compra {
+  id           Int        @id @default(autoincrement())
+  data         DateTime   @default(now())
+  numeroInvoice String?   // Número extraído pelo OCR depois
+  urlPdf       String?    // Link de onde o PDF vai ficar salvo
+  quantidade   Int
+  valorTotal   Float
+
+  // Relacionamento com Fornecedor
+  fornecedorId Int
+  fornecedor   Fornecedor @relation(fields: [fornecedorId], references: [id])
+
+  // Relacionamento com Item
+  itemId       Int
+  item         Item       @relation(fields: [itemId], references: [id])
+}
