@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-const { PrismaClient } = require('@prisma/client'); 
+const { PrismaClient } = require('@prisma/client');
+const multer = require('multer');
 
 const prisma = new PrismaClient(); 
 const app = express();
+const upload = multer({dest: 'upload'});
 const port = 3000;
 
 app.use(cors());
@@ -11,8 +13,17 @@ app.use(express.json());
 
 // Rota de teste
 app.get('/api/teste', (req, res) => {
-  res.json({ mensagem: 'Servidor back-end rodando perfeitamente!' });
-});
+ 
+  res.json({ mensagem: 'Servidor back-end rodando perfeitamente!', 
+  });             
+   });
+app.post('/api/upload', upload.single('documento'), (req, res)=> {
+    console.log("Arquivo recebido:", req.file);
+    res.json({ mensagem: 'Servidor back-end rodando perfeitamente!', 
+             detalhes: req.file    
+   });
+  });
+
 
 // Rota para Criar um Local de Armazenamento
 app.post('/api/locais', async (req, res) => {
